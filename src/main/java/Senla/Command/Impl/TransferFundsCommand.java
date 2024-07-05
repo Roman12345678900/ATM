@@ -19,25 +19,25 @@ public class TransferFundsCommand implements Command {
 
     @Override
     public void execute() {
-        System.out.println("Введите номер карты получателя (формат XXXX-XXXX-XXXX-XXXX):");
+        System.out.println("Enter the recipient's card number (format XXXX-XXXX-XXXX-XXXX):");
         String recipientCardNumber = scanner.nextLine();
         if (!recipientCardNumber.matches("\\d{4}-\\d{4}-\\d{4}-\\d{4}")) {
-            System.out.println("Неверный формат номера карты.");
+            System.out.println("Invalid card number format.");
             return;
         }
         Account recipientAccount = accounts.get(recipientCardNumber);
         if (recipientAccount == null) {
-            System.out.println("Получатель не найден.");
+            System.out.println("Recipient not found.");
             return;
         }
-        System.out.println("Введите сумму для перевода:");
+        System.out.println("Enter the amount to transfer:");
         double amount = Double.parseDouble(scanner.nextLine());
         if (amount > account.getBalance()) {
-            System.out.println("Недостаточно средств на счете.");
+            System.out.println("Insufficient funds in the account.");
         } else {
             account.setBalance(account.getBalance() - amount);
             recipientAccount.setBalance(recipientAccount.getBalance() + amount);
-            System.out.println("Средства успешно переведены. Текущий баланс: " + account.getBalance());
+            System.out.println("Funds have been successfully transferred. Current balance: " + account.getBalance());
         }
     }
 }

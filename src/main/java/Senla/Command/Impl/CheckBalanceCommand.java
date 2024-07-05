@@ -12,6 +12,6 @@ public class CheckBalanceCommand implements Command {
 
     @Override
     public void execute() {
-        System.out.println("Ваш баланс: " + account.getBalance());
+        System.out.println("Your balance: " + account.getBalance());
     }
 }
