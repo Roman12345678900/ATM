@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DataManager {
-    private static final String DATA_FILE = "accounts.txt";
+    private static final String dataFile = "accounts.txt";
 
     public Map<String, Account> loadAccounts() {
         Map<String, Account> accounts = new HashMap<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(DATA_FILE))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(" ");
@@ -29,7 +29,7 @@ public class DataManager {
     }
 
     public void saveAccounts(Map<String, Account> accounts) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dataFile))) {
             for (Account account : accounts.values()) {
                 writer.write(account.toString());
                 writer.newLine();
