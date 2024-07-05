@@ -1,7 +1,6 @@
 package Senla;
 
 public class Account {
-
     private String cardNumber;
     private String pinCode;
     private double balance;
@@ -33,3 +32,4 @@ public class Account {
         return cardNumber + " " + pinCode + " " + balance;
     }
 }
+
