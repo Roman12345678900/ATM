@@ -1,36 +1,21 @@
 package Senla;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CardStatus {
-    private static final long UNBLOCK_TIME_MS = 24 * 60 * 60 * 1000;
     private Map<String, Integer> failedAttempts = new HashMap<>();
     private Map<String, Long> blockedCards = new HashMap<>();
-
-    public boolean isCardBlocked(String cardNumber) {
-        if (blockedCards.containsKey(cardNumber)) {
-            long blockedTime = blockedCards.get(cardNumber);
-            if (new Date().getTime() - blockedTime >= UNBLOCK_TIME_MS) {
-                unblockCard(cardNumber);
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private void blockCard(String cardNumber) {
-        blockedCards.put(cardNumber, new Date().getTime());
-    }
+    private static final int MAX_FAILED_ATTEMPTS = 3;
+    private static final long BLOCK_DURATION_MS = 24 * 60 * 60 * 1000; // 24 часа
 
     public void recordFailedAttempt(String cardNumber) {
-        int attempts = failedAttempts.getOrDefault(cardNumber, 0) + 1;
+        int attempts = failedAttempts.getOrDefault(cardNumber, 0);
+        attempts++;
         failedAttempts.put(cardNumber, attempts);
-
-        if (attempts >= 3) {
-            blockCard(cardNumber);
+        if (attempts >= MAX_FAILED_ATTEMPTS) {
+            blockedCards.put(cardNumber, System.currentTimeMillis());
+            System.out.println("Карта заблокирована из-за превышения количества неудачных попыток ввода ПИН-кода.");
         }
     }
 
@@ -38,8 +23,15 @@ public class CardStatus {
         failedAttempts.remove(cardNumber);
     }
 
-    private void unblockCard(String cardNumber) {
-        blockedCards.remove(cardNumber);
-        resetFailedAttempts(cardNumber);
+    public boolean isCardBlocked(String cardNumber) {
+        Long blockedTime = blockedCards.get(cardNumber);
+        if (blockedTime == null) {
+            return false;
+        }
+        if (System.currentTimeMillis() - blockedTime >= BLOCK_DURATION_MS) {
+            blockedCards.remove(cardNumber);
+            return false;
+        }
+        return true;
     }
 }

@@ -1,38 +1,41 @@
 package Senla;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DataManager {
+    private static final String DATA_FILE = "accounts.txt";
 
-    private static final String FILE_NAME = "accounts.txt";
+    public Map<String, Account> loadAccounts() {
+        Map<String, Account> accounts = new HashMap<>();
 
-    public List<Account> loadAccounts() {
-        List<Account> accounts = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(DATA_FILE))) {
             String line;
-            while ((line = br.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(" ");
-                String cardNumber = parts[0];
-                String pinCode = parts[1];
-                double balance = Double.parseDouble(parts[2]);
-                accounts.add(new Account(cardNumber, pinCode, balance));
+                if (parts.length == 3) {
+                    String cardNumber = parts[0];
+                    String pinCode = parts[1];
+                    double balance = Double.parseDouble(parts[2]);
+                    accounts.put(cardNumber, new Account(cardNumber, pinCode, balance));
+                }
             }
         } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
+            System.out.println("Ошибка при загрузке данных: " + e.getMessage());
         }
+
         return accounts;
     }
 
-    public void saveAccounts(List<Account> accounts) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (Account account : accounts) {
-                bw.write(account.toString());
-                bw.newLine();
+    public void saveAccounts(Map<String, Account> accounts) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
+            for (Account account : accounts.values()) {
+                writer.write(account.toString());
+                writer.newLine();
             }
         } catch (IOException e) {
-            System.err.println("Error writing file: " + e.getMessage());
+            System.out.println("Ошибка при сохранении данных: " + e.getMessage());
         }
     }
 }

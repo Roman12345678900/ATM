@@ -1,13 +1,21 @@
 package Senla;
 
-import java.util.List;
+import Senla.Command.Command;
+import Senla.Command.Impl.CheckBalanceCommand;
+import Senla.Command.Impl.DepositCommand;
+import Senla.Command.Impl.TransferFundsCommand;
+import Senla.Command.Impl.WithdrawCommand;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
-//перевести на карту
-class ATMOperations {
-    private List<Account> accounts;
+
+public class ATMOperations {
+    private Map<String, Account> accounts;
     private DataManager dataManager;
     private Account currentAccount;
     private CardStatus cardStatus;
+    private Map<String, Command> commands;
 
     public ATMOperations() {
         dataManager = new DataManager();
@@ -19,28 +27,29 @@ class ATMOperations {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Enter card number (format XXXX-XXXX-XXXX-XXXX):");
+            System.out.println("Введите номер карты (формат XXXX-XXXX-XXXX-XXXX):");
             String cardNumber = scanner.nextLine();
 
             if (!isValidCardNumber(cardNumber)) {
-                System.out.println("Invalid card number format.");
+                System.out.println("Неверный формат номера карты.");
                 continue;
             }
 
             if (cardStatus.isCardBlocked(cardNumber)) {
-                System.out.println("The card is blocked. Please try again later.");
+                System.out.println("Карта заблокирована. Попробуйте позже.");
                 continue;
             }
 
-            System.out.println("Enter your PIN:");
+            System.out.println("Введите ПИН-код:");
             String pinCode = scanner.nextLine();
 
             if (authenticate(cardNumber, pinCode)) {
-                System.out.println("Successful authorization.");
+                System.out.println("Успешная авторизация.");
                 cardStatus.resetFailedAttempts(cardNumber);
+                initializeCommands(scanner);
                 showMenu(scanner);
             } else {
-                System.out.println("Incorrect card number or PIN.");
+                System.out.println("Неправильный номер карты или ПИН-код.");
                 cardStatus.recordFailedAttempt(cardNumber);
             }
         }
@@ -51,67 +60,46 @@ class ATMOperations {
     }
 
     private boolean authenticate(String cardNumber, String pinCode) {
-        for (Account account : accounts) {
-            if (account.getCardNumber().equals(cardNumber) && account.getPinCode().equals(pinCode)) {
-                currentAccount = account;
-                return true;
-            }
+        Account account = accounts.get(cardNumber);
+        if (account != null && account.getPinCode().equals(pinCode)) {
+            currentAccount = account;
+            return true;
         }
         return false;
     }
 
-    private void withdraw(Scanner scanner) {
-        System.out.println("Enter the amount to withdraw:");
-        double amount = Double.parseDouble(scanner.nextLine());
-        if (amount > currentAccount.getBalance()) {
-            System.out.println("Insufficient funds in the account.");
-        } else {
-            currentAccount.setBalance(currentAccount.getBalance() - amount);
-            System.out.println("The funds were successfully withdrawn. Current balance: " + currentAccount.getBalance());
-        }
-    }
-
-    private void deposit(Scanner scanner) {
-        System.out.println("Enter the amount to top up (no more than 1,000,000):");
-        double amount = Double.parseDouble(scanner.nextLine());
-        if (amount > 1000000) {
-            System.out.println("The amount exceeds the maximum value for replenishment.");
-        } else {
-            currentAccount.setBalance(currentAccount.getBalance() + amount);
-            System.out.println("The balance has been successfully replenished. Current balance: " + currentAccount.getBalance());
-        }
-    }
-
-    private void checkBalance() {
-        System.out.println("Your balance: " + currentAccount.getBalance());
+    private void initializeCommands(Scanner scanner) {
+        commands = new HashMap<>();
+        commands.put("1", new CheckBalanceCommand(currentAccount));
+        commands.put("2", new WithdrawCommand(currentAccount, scanner));
+        commands.put("3", new DepositCommand(currentAccount, scanner));
+        commands.put("4", new TransferFundsCommand(currentAccount, accounts, scanner));
     }
 
     private void showMenu(Scanner scanner) {
         while (true) {
-            System.out.println("Choose an action:");
-            System.out.println("1. Check balance");
-            System.out.println("2. Withdraw funds");
-            System.out.println("3. Top up balance");
-            System.out.println("4. Exit");
+            System.out.println("Выберите действие:");
+            System.out.println("1. Проверить баланс");
+            System.out.println("2. Снять средства");
+            System.out.println("3. Пополнить баланс");
+            System.out.println("4. Перевести средства");
+            System.out.println("5. Выйти");
 
             String choice = scanner.nextLine();
-            switch (choice) {
-                case "1":
-                    checkBalance();
-                    break;
-                case "2":
-                    withdraw(scanner);
-                    break;
-                case "3":
-                    deposit(scanner);
-                    break;
-                case "4":
-                    dataManager.saveAccounts(accounts);
-                    System.out.println("Log out of the system.");
-                    return;
-                default:
-                    System.out.println("Wrong choice. Please try again.");
-            }
+            executeOption(choice);
+        }
+    }
+
+    private void executeOption(String choice) {
+        Command command = commands.get(choice);
+        if (command != null) {
+            command.execute();
+        } else if ("5".equals(choice)) {
+            dataManager.saveAccounts(accounts);
+            System.out.println("Выход из системы.");
+            System.exit(0);
+        } else {
+            System.out.println("Неверный выбор. Повторите попытку.");
         }
     }
 }
