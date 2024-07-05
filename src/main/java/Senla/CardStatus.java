@@ -6,14 +6,14 @@ import java.util.Map;
 public class CardStatus {
     private Map<String, Integer> failedAttempts = new HashMap<>();
     private Map<String, Long> blockedCards = new HashMap<>();
-    private static final int MAX_FAILED_ATTEMPTS = 3;
-    private static final long BLOCK_DURATION_MS = 24 * 60 * 60 * 1000; // 24 часа
+    private static final int maxFailedAttempts = 3;
+    private static final long blockDurationMs = 24 * 60 * 60 * 1000;
 
     public void recordFailedAttempt(String cardNumber) {
         int attempts = failedAttempts.getOrDefault(cardNumber, 0);
         attempts++;
         failedAttempts.put(cardNumber, attempts);
-        if (attempts >= MAX_FAILED_ATTEMPTS) {
+        if (attempts >= maxFailedAttempts) {
             blockedCards.put(cardNumber, System.currentTimeMillis());
             System.out.println("The card is blocked due to the number of unsuccessful attempts to enter the PIN code..");
         }
@@ -28,7 +28,7 @@ public class CardStatus {
         if (blockedTime == null) {
             return false;
         }
-        if (System.currentTimeMillis() - blockedTime >= BLOCK_DURATION_MS) {
+        if (System.currentTimeMillis() - blockedTime >= blockDurationMs) {
             blockedCards.remove(cardNumber);
             return false;
         }
