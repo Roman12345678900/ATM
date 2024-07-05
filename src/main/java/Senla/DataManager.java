@@ -22,7 +22,7 @@ public class DataManager {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Ошибка при загрузке данных: " + e.getMessage());
+            System.out.println("Error when enabling data: " + e.getMessage());
         }
 
         return accounts;
@@ -35,7 +35,7 @@ public class DataManager {
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Ошибка при сохранении данных: " + e.getMessage());
+            System.out.println("Error saving data: " + e.getMessage());
         }
     }
 }

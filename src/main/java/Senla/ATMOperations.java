@@ -27,29 +27,29 @@ public class ATMOperations {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Введите номер карты (формат XXXX-XXXX-XXXX-XXXX):");
+            System.out.println("Enter the card number (format XXXX-XXXX-XXXX-XXXX):");
             String cardNumber = scanner.nextLine();
 
             if (!isValidCardNumber(cardNumber)) {
-                System.out.println("Неверный формат номера карты.");
+                System.out.println("Invalid card number format.");
                 continue;
             }
 
             if (cardStatus.isCardBlocked(cardNumber)) {
-                System.out.println("Карта заблокирована. Попробуйте позже.");
+                System.out.println("The card is blocked. Try later.");
                 continue;
             }
 
-            System.out.println("Введите ПИН-код:");
+            System.out.println("Enter your PIN:");
             String pinCode = scanner.nextLine();
 
             if (authenticate(cardNumber, pinCode)) {
-                System.out.println("Успешная авторизация.");
+                System.out.println("Successful authorization.");
                 cardStatus.resetFailedAttempts(cardNumber);
                 initializeCommands(scanner);
                 showMenu(scanner);
             } else {
-                System.out.println("Неправильный номер карты или ПИН-код.");
+                System.out.println("Invalid card number or PIN.");
                 cardStatus.recordFailedAttempt(cardNumber);
             }
         }
@@ -78,12 +78,12 @@ public class ATMOperations {
 
     private void showMenu(Scanner scanner) {
         while (true) {
-            System.out.println("Выберите действие:");
-            System.out.println("1. Проверить баланс");
-            System.out.println("2. Снять средства");
-            System.out.println("3. Пополнить баланс");
-            System.out.println("4. Перевести средства");
-            System.out.println("5. Выйти");
+            System.out.println("Choose an action:");
+            System.out.println("1. Check balance");
+            System.out.println("2. Withdraw funds");
+            System.out.println("3. Top up balance");
+            System.out.println("4. Transfer funds");
+            System.out.println("5. Exit");
 
             String choice = scanner.nextLine();
             executeOption(choice);
@@ -96,10 +96,10 @@ public class ATMOperations {
             command.execute();
         } else if ("5".equals(choice)) {
             dataManager.saveAccounts(accounts);
-            System.out.println("Выход из системы.");
+            System.out.println("Sign Out.");
             System.exit(0);
         } else {
-            System.out.println("Неверный выбор. Повторите попытку.");
+            System.out.println("Wrong choice. Try again.");
         }
     }
 }

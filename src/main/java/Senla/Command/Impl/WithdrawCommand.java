@@ -16,13 +16,13 @@ public class WithdrawCommand implements Command {
 
     @Override
     public void execute() {
-        System.out.println("Введите сумму для снятия:");
+        System.out.println("Enter the amount to withdraw:");
         double amount = Double.parseDouble(scanner.nextLine());
         if (amount > account.getBalance()) {
-            System.out.println("Недостаточно средств на счете.");
+            System.out.println("Insufficient funds in the account.");
         } else {
             account.setBalance(account.getBalance() - amount);
-            System.out.println("Средства успешно сняты. Текущий баланс: " + account.getBalance());
+            System.out.println("The funds were successfully withdrawn. Current balance: " + account.getBalance());
         }
     }
 }

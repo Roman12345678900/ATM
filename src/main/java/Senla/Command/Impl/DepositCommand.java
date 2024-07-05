@@ -16,13 +16,13 @@ public class DepositCommand implements Command {
 
     @Override
     public void execute() {
-        System.out.println("Введите сумму для пополнения (не более 1 000 000):");
+        System.out.println("Enter the amount to top up (no more than 1,000,000):");
         double amount = Double.parseDouble(scanner.nextLine());
         if (amount > 1000000) {
-            System.out.println("Сумма превышает максимальное значение для пополнения.");
+            System.out.println("The amount exceeds the maximum value for replenishment.");
         } else {
             account.setBalance(account.getBalance() + amount);
-            System.out.println("Баланс успешно пополнен. Текущий баланс: " + account.getBalance());
+            System.out.println("The balance has been successfully replenished. Current balance: " + account.getBalance());
         }
     }
 }

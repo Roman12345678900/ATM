@@ -15,7 +15,7 @@ public class CardStatus {
         failedAttempts.put(cardNumber, attempts);
         if (attempts >= MAX_FAILED_ATTEMPTS) {
             blockedCards.put(cardNumber, System.currentTimeMillis());
-            System.out.println("Карта заблокирована из-за превышения количества неудачных попыток ввода ПИН-кода.");
+            System.out.println("The card is blocked due to the number of unsuccessful attempts to enter the PIN code..");
         }
     }
 
